@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite the archived release below.
+title: >-
+  evidence-closed-loop: reference implementation for a unified dynamical
+  theory of catatonia recovery from an evidence-coupled bistable cascade
+abstract: >-
+  Numerical corroboration for the theorems of the accompanying theory paper,
+  and regeneration of the paper's display items. The proofs are in the
+  manuscript; this software checks the quantitative statements and reproduces
+  Table 1, Figure 1, Table 2 and Table 3 in the order in which they appear
+  there.
+type: software
+authors:
+  - family-names: Saito
+    given-names: Hiroki
+    orcid: "https://orcid.org/0000-0002-4964-8559"
+    affiliation: >-
+      Onda-Daini Hospital, Chiba, Japan; Department of Neuropsychiatry,
+      Nippon Medical School, Tokyo, Japan
+version: 1.0.0
+date-released: "2026-07-22"
+license: MIT
+repository-code: "https://github.com/entrance4-png/evidence-closed-loop"
+keywords:
+  - catatonia
+  - computational psychiatry
+  - dynamical systems
+  - bistability
+  - Allee threshold
+  - Fisher information
+  - asymptotically autonomous systems
+  - reproducibility

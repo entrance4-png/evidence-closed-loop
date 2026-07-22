@@ -1,0 +1,6 @@
+# Versions used for the reference run recorded in expected_output.txt
+# (Python 3.12.3). Later versions are expected to work; matplotlib is
+# needed only to regenerate Figure 1.
+numpy==2.4.4
+scipy==1.17.1
+matplotlib==3.10.8

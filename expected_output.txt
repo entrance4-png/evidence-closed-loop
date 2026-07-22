@@ -1,0 +1,166 @@
+==============================================================================
+A unified dynamical theory of catatonia recovery from an evidence-coupled
+bistable cascade : reference implementation  [mode: quick]
+kappa=[0.6, 0.6, 0.6] eps=0.02 rho=1.0 a0=0.6 a1=0.15 p=2.0
+==============================================================================
+
+-- Figure 1 --
+     [Figure 1] written to /home/claude/repo/figure1.png (278 kB)
+
+-- Proved (unconditional) --
+[T0 proved] invariance of [0,1]^5: 0 violations in 5000 samples -> PASS
+[T1 proved] evidence-mediated acceleration: dr/dQ>0, convexity d2r/dQ2>0; degree a''/a'=(p-1)/Q:
+        Q=0.25: a''/a'=4.0000  (p-1)/Q=4.0000
+        Q=0.5: a''/a'=2.0000  (p-1)/Q=2.0000
+        Q=0.75: a''/a'=1.3333  (p-1)/Q=1.3333
+     absolute curvature p(p-1)(a0-a1)r(1-r)Q^(p-2): constant in Q for p=2.0 (low-Q dominance is RELATIVE)
+[T2] recovered stable for ANY rho; pathological needs rho>0:
+     E_rec: dQ=0.0e+00 (exact); Q-eigenvalue=-eps*chi+(1-a1)=-5.01e-03 (<0, any rho)
+     E_path: dQ=0.0e+00 (exact)
+     E_path rho=1.0: Q-eigenvalue=-1.24e-03 (<0 hyperbolic)
+     E_path rho=0.0: Q-eigenvalue=0.00e+00 (=0 NON-hyperbolic)
+[T3a proved] frozen-evidence ROOT trigger (root-only criterion r0(T)<0.15):
+        Delta=0.55: r0+=0.45 predicted Q_c=0.5774 measured=0.5772
+        Delta=0.5: r0+=0.50 predicted Q_c=0.4714 measured=0.4715
+[T3c1 proved] exact invariant SWITCHING MANIFOLD of root: boundary=Q_c=0.57735 at every eps:
+        eps=0.02: root boundary=0.57735 (|b-Q_c|=0.00000; exact, not singular-limit)
+        eps=0.005: root boundary=0.57735 (|b-Q_c|=0.00000; exact, not singular-limit)
+
+-- Proved given the observation-model premise --
+[T4 premise] closed form Q(t)=1-(1-Q0)exp(-eps N(t)) vs integration, N carried as a coordinate:
+        Q0=0.0: Q(400)=0.0153418323  closed form=0.0153418323  max|difference|=2.6e-17
+        Q0=0.4: Q(400)=0.4631339937  closed form=0.4631339937  max|difference|=5.6e-16
+        Q0=0.4: Q(t=20000)=1.0000 (Q -> 1 asymptotically; Q < 1 at every finite time)
+
+-- Conditional (coupling / initial configuration) --
+[T3b] propagation: sufficient bound NOT necessary; some coupling IS:
+     conservative sufficient bound kappa>1.155; propagation vs kappa:
+        kappa=0.00 (<bound): no/partial (max r=1.000, Q=0.009)
+        kappa=0.05 (<bound): COLLAPSE (max r=0.000, Q=0.009)
+        kappa=0.60 (<bound): COLLAPSE (max r=0.000, Q=0.009)
+[T3c2] absorption needs a RECOVERED config; not unconditional over data:
+     recovered config, sub-threshold: r_min=1.000 -> absorbed
+     root-recovered but downstream=0, kappa=0.0: r=[1. 0. 0. 0.] (STUCK => IC needed)
+     root-recovered but downstream=0, kappa=0.6: r=[1. 1. 1. 1.] (recovered)
+
+-- Global two-outcome under strong coupling (T5) --
+[T5] global two-outcome under strong coupling; K*=max(0.253,0.291)=0.291; illustrative kappa=0.6 > K*:
+     S-continuum E_S(Q)=(a(Q),...,Q): max|d| over Q=0.0e+00 (=0 => only 2 ATTRACTORS off S, not 2 equilibria)
+     representative off-manifold ICs (finite sample, not a proof):
+     z(0)=+0.52 -> E_rec OK
+     z(0)=-0.04 -> E_path OK
+     weak coupling kappa=0.003 (a1^2/4=0.0056 is first-stage low-root threshold only):
+        mixed eq r=[1.00e+00 2.38e-02 5.00e-04 0.00e+00] Q=1.0000; residual |f|inf=3.5e-18
+        analytic eig: state-block max=-1.00e-01, Q-dir=-5.11e-13; numeric(inward) max=-5.11e-13
+        -> GENUINE STABLE mixed eq (global bistability FALSE)
+
+-- Structural dependence (Table 1) --
+[Table 1] structural dependence, one ablation per row (illustrative; not a proof
+          of logical independence or uniqueness of the axioms):
+     remove bistability (monostable g=r(1-r)): same excursion gives max r=0.00 with Allee, min r=1.00 without -> no distinct collapse basin
+     remove concavity (p=1): a''=0.0 -> no convex evidence-to-rate gain
+     remove evidence gating (C=1): one node offline gives dQ=0.0e+00 gated vs 2.2e-04 ungated -> no cross-level self-catalysis
+     remove regime exclusivity (soft selector): boundary eps=0.02 -> 0.5935, eps=0.005 -> 0.5820 (eps-dependent, NOT exact vs Q_c=0.5774)
+     remove coupling (kappa=0): downstream=[1. 1. 1.] -> no whole-layer propagation
+
+==============================================================================
+DISPLAY ITEMS, in the order in which they appear in the manuscript
+==============================================================================
+
+-- Table 1 --
+     +----------------------------------+------------------------------------------------+
+     | Structure removed                | Component lost                                 |
+     +----------------------------------+------------------------------------------------+
+     | Bistability (Axiom B)            | A distinct collapse basin                      |
+     +----------------------------------+------------------------------------------------+
+     | Concavity of a(Q) (Axiom D)      | Convex evidence-to-rate gain                   |
+     +----------------------------------+------------------------------------------------+
+     | Evidence gating C(r) (Axiom C)   | Evidence-mediated cross-level self-catalysis   |
+     +----------------------------------+------------------------------------------------+
+     | Regime exclusivity (Axiom E)     | Exact finite-timescale root switching manifold |
+     +----------------------------------+------------------------------------------------+
+     | Directional coupling (Axiom A)   | Whole-layer propagation                        |
+     +----------------------------------+------------------------------------------------+
+     Table 1. Structural dependence within the present construction: removing each
+     listed structure eliminates at least the corresponding component. This does not
+     assert logical independence or uniqueness of the axioms.
+
+-- Figure 1 --
+     file: /home/claude/repo/figure1.png
+     Figure 1. Dependency structure of the construction. Axiom A, the forward
+     dependency chain, splits into a recovery direction, in which evidence gating
+     (Axiom C) yields the evidence law (T4), concave basin deepening (Axiom D) then
+     gives super-linear acceleration (T1) and a stable recovered state (T2); and a
+     collapse direction, in which bistability and the regime-selective update (Axioms
+     B and E), triggered by root autonomy, give the fragile window and whole-layer
+     collapse (T3). Under strong coupling both directions resolve into the global
+     two-outcome dichotomy (T5). The dashed edge is the self-catalytic feedback by
+     which downstream recovery raises the evidence rate. The top row maps the paper:
+     bedside observations motivate the five axioms (A to E), which entail the
+     theorems T1 to T5, which yield the testable predictions.
+
+-- Table 2 --
+     +--------------------------------------------+--------------------------------------+
+     | Result                                     | Status                               |
+     +--------------------------------------------+--------------------------------------+
+     | T0 positive invariance                     | Proved                               |
+     +--------------------------------------------+--------------------------------------+
+     | T4 evidence law Q = 1 - (1-Q0)exp(-eps N), | Proved, given the premise            |
+     | monotone in N                              |                                      |
+     +--------------------------------------------+--------------------------------------+
+     | T1 evidence-mediated acceleration,         | Proved                               |
+     | convexity, degree                          |                                      |
+     +--------------------------------------------+--------------------------------------+
+     | T2 recovered state stable                  | Proved, unconditional in rho         |
+     +--------------------------------------------+--------------------------------------+
+     | T2 pathological state stable               | Proved for rho > 0                   |
+     |                                            | (non-hyperbolic at rho = 0)          |
+     +--------------------------------------------+--------------------------------------+
+     | T3(a) frozen-evidence root trigger         | Proved (exact)                       |
+     +--------------------------------------------+--------------------------------------+
+     | T3(b) whole-layer propagation              | Proved under a sufficient coupling   |
+     |                                            | bound; some coupling necessary,      |
+     |                                            | bound not                            |
+     +--------------------------------------------+--------------------------------------+
+     | T3(c1) exact invariant switching           | Proved (all eps, rho)                |
+     | manifold of the root                       |                                      |
+     +--------------------------------------------+--------------------------------------+
+     | T3(c2) whole-layer outcome and             | Proved from a recovered              |
+     | absorption                                 | configuration (not over arbitrary    |
+     |                                            | data)                                |
+     +--------------------------------------------+--------------------------------------+
+     | T5 two-outcome convergence off S,          | Proved for rho > 0 and               |
+     | strong coupling                            | kappa_k > K* ~= 0.291                |
+     +--------------------------------------------+--------------------------------------+
+     | Equilibrium continuum on S; stable mixed   | Characterised; kappa < a1^2/4 is     |
+     | branch at sufficiently weak coupling       | the explicit first-stage low-root    |
+     |                                            | condition                            |
+     +--------------------------------------------+--------------------------------------+
+     | S is the global boundary of the two        | Proved under T5 strong coupling;     |
+     | corner basins                              | not in the general T1 to T4 regime   |
+     +--------------------------------------------+--------------------------------------+
+     | E_rec and E_path are the only equilibria   | False (equilibrium continuum E_S     |
+     |                                            | on S)                                |
+     +--------------------------------------------+--------------------------------------+
+     | Axiom E (regime exclusivity)               | Modelling commitment, stated at      |
+     |                                            | class level                          |
+     +--------------------------------------------+--------------------------------------+
+     | Clinical validity of the observation model | Empirical; out of scope here         |
+     +--------------------------------------------+--------------------------------------+
+     Table 2. Status of theoretical results.
+
+-- Table 3 --
+     +------------------------------------------------+------------------------------------+
+     | Question                                       | Where it is answered               |
+     +------------------------------------------------+------------------------------------+
+     | Why does recovery take this order?             | companion identifiability theory   |
+     |                                                | (refs 2, 3)                        |
+     +------------------------------------------------+------------------------------------+
+     | Why does recovery have this dynamics           | this paper (Theorems T1 to T5)     |
+     | (self-catalysis, stability, fragile window,    |                                    |
+     | collapse, evidence identity)?                  |                                    |
+     +------------------------------------------------+------------------------------------+
+     Table 3. Division of labour with the companion theory.
+
+------------------------------------------------------------------------------
+done in 79.5s. Status mirrors Table 2; Axiom E is disclosed.
