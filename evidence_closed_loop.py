@@ -71,20 +71,49 @@ STATUS (mirrors Table 2 of the manuscript, "Status of theoretical results")
     kappa < a1^2/4 is the first-stage low-root condition, not the whole-branch one.
 Axiom E is a disclosed modelling commitment; clinical validity is empirical.
 
+AXIOM E IS THE LOAD-BEARING IDEALISATION
+----------------------------------------
+The mutual exclusivity of the selectors (disjoint supports, both vanishing at z = 0) is
+what makes S invariant at every timescale: on S both selectors are zero, the evidence is
+frozen, and no trajectory crosses. The exactness of T3c1 and its eps-independence are
+therefore CONSEQUENCES OF THAT CHOICE, not independent findings. The axiom was selected
+for analytic tractability and is not derived from the observation model; the change-point
+reading that motivates it is, in its standard form, a soft procedure. It is offered as a
+falsifiable limit: the Table 1 row-4 ablation replaces the exclusive selectors by an
+overlapping soft pair and the switching boundary becomes eps-dependent, approaching the
+exact Q_c as the evidence timescale is made slow (0.5935 at eps = 0.02, 0.5820 at
+eps = 0.005, against Q_c = 0.5774). A measured boundary moving systematically with the
+rate of evidence accumulation would count against the idealisation.
+
+ILLUSTRATIVE NUMBERS
+--------------------
+Every number this script prints (milestone and consolidation times, boundary locations,
+the mixed-branch eigenvalues) is illustrative and depends on the selector shape and the
+parameter choice. Because chi_+(z) = exp(-1/z^2) is extremely small for small z,
+TIMESCALES IN PARTICULAR MUST NOT BE READ AS PREDICTED REAL TIMES. The theorems depend
+only on the class properties stated in Axiom E and are unaffected by this dependence.
+
 DISPLAY ITEMS
 -------------
 Running the script regenerates the display items in the order in which they appear in
 the manuscript: Table 1 (structural dependence), Figure 1, Table 2 (status of
-theoretical results), Table 3 (division of labour). Figure 1 is written as a PNG file
-next to this script, before the integrations start, so that it does not depend on the
-rest of the run; its legend is printed later, in manuscript order, with the other
-display items.
+theoretical results), Table 3 (division of labour). ALL FOUR ARE DRAWN: Figure 1 and the
+three tables are written as PNG files next to this script (figure1.png, table1.png,
+table2.png, table3.png) before the integrations start, so they do not depend on the rest
+of the run finishing. Each table PNG is drawn from the same row text and the same column
+proportions as the ASCII version, so the drawn and the printed table cannot drift apart.
+The ASCII tables and the figure legend are printed later, in manuscript order. In a
+notebook the images are also displayed inline as they are written.
 
 USAGE:  python3 evidence_closed_loop.py [--quick | --full]
                                         [--no-figure | --figure-only]
                                         [--figure-path PATH]
-        --figure-only writes Figure 1 and exits, without running the verification.
-        --figure-path sets the output file (default: figure1.png beside this script).
+        --figure-only writes Figure 1 and Tables 1 to 3 as PNGs and exits, without
+        running the verification.
+        --figure-path sets the Figure 1 output file (default: figure1.png beside this
+        script); the three table PNGs are written into the same directory. The directory
+        is created if it does not exist.
+        --no-figure skips all four images; the ASCII tables still print.
         Runtime is integration bound; quick is the default.
 """
 import os
@@ -252,6 +281,55 @@ def check_T3c1_separatrix():
         print(f"        eps={eps}: root boundary={b:.5f} (|b-Q_c|={abs(b-Qc):.5f}; exact, not singular-limit)")
 
 
+def check_P1():
+    """Proposition 1: under root-initiated ordered initial data the four state
+    variables keep the prerequisite order, so their first-passage times at a common
+    threshold are ordered. Second half: in the unforced system the state diagonal is
+    invariant, so an exactly uniform state onset recovers synchronously and no order
+    appears. Corroboration only; the proof is in the manuscript Methods."""
+    q = 0.5
+    kappas = (0.2, 0.6) if QUICK else (0.05, 0.2, 0.6, 1.2)
+    roots = (0.8, 0.99) if QUICK else (0.5, 0.8, 0.99)
+    Q0s = (0.0, 0.9) if QUICK else (0.0, 0.3, 0.9)
+    worst, bad, n = 0.0, 0, 0
+    for kap in kappas:
+        K = np.array([0.0, kap, kap, kap])
+        for r0 in roots:
+            for Q0 in Q0s:
+                if r0 <= a_of_Q(Q0):
+                    continue                      # not a root-initiated recovery
+                n += 1
+                sol = solve_ivp(lambda t, y: rhs(t, y, kappa=K), [0, 400],
+                                np.array([r0, 0.0, 0.0, 0.0, Q0]),
+                                t_eval=np.linspace(0, 400, 20001),
+                                rtol=1e-10, atol=1e-12, max_step=0.5)
+                if not sol.success:
+                    raise RuntimeError('solver failed: ' + sol.message)
+                y = sol.y
+                gaps = [(y[k] - y[k + 1]).min() for k in range(NS - 1)]
+                worst = min(worst, min(gaps))
+                T = []
+                for k in range(NS):
+                    i = int(np.argmax(y[k] >= q))
+                    T.append(sol.t[i] if y[k][i] >= q else np.inf)
+                if min(gaps) < -1e-9 or any(T[k] > T[k + 1] + 1e-9 for k in range(NS - 1)):
+                    bad += 1
+    print(f"[P1 proved] root-initiated order preservation, {n} configurations "
+          f"(kappa, root level, Q0): {bad} violations, worst gap "
+          f"min(r_k - r_k+1) = {worst:.2e} -> {'PASS' if bad == 0 else 'FAIL'}")
+    spread = 0.0
+    for v in (0.3, 0.7):
+        for Q0 in (0.2, 0.8):
+            sol = solve_ivp(lambda t, y: rhs(t, y), [0, 400],
+                            np.array([v, v, v, v, Q0]),
+                            t_eval=np.linspace(0, 400, 8001),
+                            rtol=1e-10, atol=1e-12, max_step=0.5)
+            spread = max(spread, float(np.abs(sol.y[:NS] - sol.y[0]).max()))
+    print(f"     state diagonal invariant under u = 0: max spread over the four states "
+          f"= {spread:.1e} (exactly uniform onset recovers synchronously,")
+    print("     so ordered recovery needs the symmetry breaking supplied by u(t))")
+
+
 # ---------------------------------------------------------------- premise
 def rhs_augmented(t, x):
     """Full system with the evidence integral N(t) = int chi_+(z) C ds as a coordinate."""
@@ -387,6 +465,14 @@ def check_T5():
     print(f"        analytic eig: state-block max={state_max:.2e}, Q-dir={lam_an[NS]:.2e}; "
           f"numeric(inward) max={max_re_num:.2e}")
     print(f"        -> {'GENUINE STABLE mixed eq (global bistability FALSE)' if stable else 'CHECK'}")
+    # Prediction 1 reads this branch. Descriptive only; nothing above is recomputed.
+    print("        PREDICTION 1 reads this branch: it is NOT a mild residual state. The root is")
+    print("        fully recovered while policy, motivational and fast-volatility precision are")
+    print("        essentially absent at fully consolidated evidence, i.e. a severe stationary")
+    print("        partial state (restored reactivity, absent initiation, absent contextual")
+    print(f"        stability). State-block eigenvalues are of order {abs(state_max):.0e} while the evidence")
+    print("        direction is effectively neutral, so the configuration is entered on the")
+    print("        ordinary recovery timescale and then persists rather than drifting.")
 
 
 # ---------------------------------------------------------------- structural dependence (Table 1)
@@ -487,17 +573,20 @@ def _wrap(text, width):
     return '\n'.join(out)
 
 
+TABLE1_ROWS = [('Structure removed', 'Component lost'),
+               ('Bistability (Axiom B)', 'A distinct collapse basin'),
+               ('Concavity of a(Q) (Axiom D)', 'Convex evidence-to-rate gain'),
+               ('Evidence gating C(r) (Axiom C)', 'Evidence-mediated cross-level self-catalysis'),
+               ('Regime exclusivity (Axiom E)', 'Exact finite-timescale root switching manifold'),
+               ('Directional coupling (Axiom A)', 'Whole-layer propagation')]
+TABLE1_CAPTION = ('Table 1. Structural dependence within the present construction: removing each '
+                  'listed structure eliminates at least the corresponding component. This does not '
+                  'assert logical independence or uniqueness of the axioms.')
+TABLE1_WIDTHS = (32, 46)
+
+
 def emit_table1():
-    rows = [('Structure removed', 'Component lost'),
-            ('Bistability (Axiom B)', 'A distinct collapse basin'),
-            ('Concavity of a(Q) (Axiom D)', 'Convex evidence-to-rate gain'),
-            ('Evidence gating C(r) (Axiom C)', 'Evidence-mediated cross-level self-catalysis'),
-            ('Regime exclusivity (Axiom E)', 'Exact finite-timescale root switching manifold'),
-            ('Directional coupling (Axiom A)', 'Whole-layer propagation')]
-    _print_table(rows, (32, 46),
-                 _wrap('Table 1. Structural dependence within the present construction: removing each '
-                       'listed structure eliminates at least the corresponding component. This does not '
-                       'assert logical independence or uniqueness of the axioms.', 80).split('\n'))
+    _print_table(TABLE1_ROWS, TABLE1_WIDTHS, _wrap(TABLE1_CAPTION, 80).split('\n'))
 
 
 _FIG1_SHOWN_INLINE = False
@@ -509,8 +598,9 @@ FIG1_LEGEND = ('Figure 1. Dependency structure of the construction. Axiom A, the
                'update (Axioms B and E), triggered by root autonomy, give the fragile window and whole-layer '
                'collapse (T3). Under strong coupling both directions resolve into the global two-outcome '
                'dichotomy (T5). The dashed edge is the self-catalytic feedback by which downstream recovery '
-               'raises the evidence rate. The top row maps the paper: bedside observations motivate the five '
-               'axioms (A to E), which entail the theorems T1 to T5, which yield the testable predictions.')
+               'raises the evidence rate. The top row maps the paper: independently reported clinical features '
+               'motivate the five axioms (A to E), which entail the theorems T1 to T5, which yield the '
+               'testable predictions.')
 
 
 def _draw_figure1(plt, FancyBboxPatch, FancyArrowPatch, path):
@@ -540,7 +630,7 @@ def _draw_figure1(plt, FancyBboxPatch, FancyArrowPatch, path):
 
     # top banner: the map of the paper
     by, bh, bw = 112.5, 8.5, 21
-    m1 = box(14, by, bw, bh, 'bedside\nobservations', MAP, '#f2f2f2', 7.6)
+    m1 = box(14, by, bw, bh, 'reported clinical\nfeatures', MAP, '#f2f2f2', 7.6)
     m2 = box(38, by, bw, bh, 'five axioms\n(A to E)', MAP, '#f2f2f2', 7.6)
     m3 = box(62, by, bw, bh, 'theorems\n(T1 to T5)', MAP, '#f2f2f2', 7.6)
     m4 = box(86, by, bw, bh, 'testable\npredictions', MAP, '#f2f2f2', 7.6)
@@ -580,6 +670,7 @@ def make_figure1(path=None, announce=True):
     """Regenerate Figure 1. Returns the absolute path written, or None if it could not
     be written, in which case the reason is printed."""
     path = _default_figure_path() if path is None else os.path.abspath(path)
+    os.makedirs(os.path.dirname(path) or '.', exist_ok=True)
     try:
         import matplotlib
         matplotlib.use('Agg')
@@ -607,8 +698,88 @@ def make_figure1(path=None, announce=True):
     return path
 
 
-def emit_table2():
-    rows = [('Result', 'Status'),
+def _draw_table_png(rows, widths, caption, path, fontsize=8.2):
+    """Render one display table to a PNG, using the same row text and the same column
+    proportions as the ASCII emitter, so the printed and the drawn table cannot drift
+    apart. Booktabs-style rules: top, under the header, bottom. Nothing here computes
+    anything; it only draws strings that are already fixed above."""
+    try:
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+    except ImportError as exc:
+        print(f"     [{caption.split('.')[0]}] NOT WRITTEN: matplotlib is not available ({exc}).")
+        return None
+    plt.rcParams.update({'font.family': 'DejaVu Sans'})
+    INK, RULE, GREY = '#1a1a1a', '#1a1a1a', '#8a8a8a'
+    ncol = len(widths)
+    total = float(sum(widths))
+    fig_width = 7.4 if ncol == 2 else 10.2
+    cells = [[str(c).split('\n') for c in row] for row in rows]
+    heights = [max(len(c) for c in cell) for cell in cells]
+    line_h = fontsize * 1.62 / 72.0                     # inches per text line
+    row_pad = 0.115                                    # inches of padding per row
+    cap_lines = _wrap(caption, int(total * 1.12)).split('\n')
+    body_h = sum(h * line_h + row_pad for h in heights)
+    cap_h = len(cap_lines) * line_h + 0.10
+    fig_height = body_h + cap_h + 0.42
+    fig, ax = plt.subplots(figsize=(fig_width, fig_height), dpi=300)
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.axis('off')
+    xs, acc = [0.02], 0.02
+    for w in widths:
+        acc += 0.96 * w / total
+        xs.append(acc)
+    fy = lambda inches: inches / fig_height             # inches -> axes fraction
+    y = 1.0 - fy(0.12)
+    ax.plot([0.02, 0.98], [y, y], color=RULE, lw=1.25)  # top rule
+    for i, (cell, h) in enumerate(zip(cells, heights)):
+        y -= fy(row_pad * 0.5)
+        for c in range(ncol):
+            for ln, text in enumerate(cell[c]):
+                ax.text(xs[c], y - fy(line_h * (ln + 0.5)), text, ha='left', va='center',
+                        fontsize=fontsize, color=INK,
+                        weight='bold' if i == 0 else 'normal')
+        y -= fy(line_h * h + row_pad * 0.5)
+        if i == 0:
+            ax.plot([0.02, 0.98], [y, y], color=RULE, lw=1.0)
+        elif i < len(cells) - 1:
+            ax.plot([0.02, 0.98], [y, y], color='#d8d8d8', lw=0.5)
+    ax.plot([0.02, 0.98], [y, y], color=RULE, lw=1.25)  # bottom rule
+    y -= fy(0.10)
+    for ln, text in enumerate(cap_lines):
+        ax.text(0.02, y - fy(line_h * (ln + 0.8)), text, ha='left', va='center',
+                fontsize=fontsize - 0.9, color=GREY)
+    fig.savefig(path, dpi=300, bbox_inches='tight', facecolor='white')
+    plt.close(fig)
+    return path
+
+
+def make_display_tables(fig_path=None, announce=True):
+    """Draw Tables 1 to 3 as PNGs next to Figure 1. Returns {name: path or None}."""
+    base = os.path.dirname(_default_figure_path() if fig_path is None else os.path.abspath(fig_path))
+    os.makedirs(base or '.', exist_ok=True)
+    specs = [('Table1', TABLE1_ROWS, TABLE1_WIDTHS, TABLE1_CAPTION),
+             ('Table2', TABLE2_ROWS, TABLE2_WIDTHS, TABLE2_CAPTION),
+             ('Table3', TABLE3_ROWS, TABLE3_WIDTHS, TABLE3_CAPTION)]
+    out = {}
+    for name, rows, widths, caption in specs:
+        path = os.path.join(base, name.lower() + '.png')
+        try:
+            written = _draw_table_png(rows, widths, caption, path)
+        except Exception as exc:
+            print(f"     [{name}] NOT WRITTEN: {type(exc).__name__}: {exc}")
+            written = None
+        out[name] = written
+        if announce and written:
+            print(f"     [{name}] written to {written} ({os.path.getsize(written) / 1024:.0f} kB)")
+        if written:
+            _show_inline(written)
+    return out
+
+
+TABLE2_ROWS = [('Result', 'Status'),
             ('T0 positive invariance', 'Proved'),
             ('T4 evidence law Q = 1 - (1-Q0)exp(-eps N),\nmonotone in N', 'Proved, given the premise'),
             ('T1 evidence-mediated acceleration,\nconvexity, degree', 'Proved'),
@@ -622,16 +793,47 @@ def emit_table2():
             ('Equilibrium continuum on S; stable mixed\nbranch at sufficiently weak coupling', 'Characterised; kappa < a1^2/4 is\nthe explicit first-stage low-root\ncondition'),
             ('S is the global boundary of the two\ncorner basins', 'Proved under T5 strong coupling;\nnot in the general T1 to T4 regime'),
             ('E_rec and E_path are the only equilibria', 'False (equilibrium continuum E_S\non S)'),
-            ('Axiom E (regime exclusivity)', 'Modelling commitment, stated at\nclass level'),
+            ('Proposition 1 state order under\nroot-initiated recovery', 'Proved (four state nodes;\nMethods)'),
+            ('Milestone order of Q relative to the\nstate nodes', 'Not proved here; the five-parameter\norder is established in the companion\ntheory under a DIFFERENT axiom class\n(refs 13, 14) and is not re-derived'),
+            ('Axiom E (regime exclusivity)', 'Modelling commitment, stated at\nclass level; load-bearing idealisation\n(see Discussion)'),
             ('Clinical validity of the observation model', 'Empirical; out of scope here')]
-    _print_table(rows, (42, 36), ['Table 2. Status of theoretical results.'])
+TABLE2_CAPTION = ('Table 2. Status of theoretical results. All numerical values quoted in this '
+                  'table and in the text are illustrative and depend on the selector shape and '
+                  'parameter choice; the theorems depend only on the class properties of Axiom E.')
+TABLE2_WIDTHS = (42, 36)
+
+
+def emit_table2():
+    _print_table(TABLE2_ROWS, TABLE2_WIDTHS, _wrap(TABLE2_CAPTION, 80).split('\n'))
+
+
+TABLE3_ROWS = [('Question', 'Companion identifiability theory\n(refs 13, 14)', 'This paper'),
+            ('Why does recovery take this\norder?',
+             'Derived from the zero-pattern of\nthe joint Fisher information,\nindependently of any recovery law',
+             'Not re-derived. The same order is\nreproduced by a DIFFERENT\nmechanism (Proposition 1)'),
+            ('Which axiom class?',
+             'Availability gating; deficit-closing\nrecovery; common impaired onset',
+             'Diffusive coupling; bistable field;\nordered root-initiated onset. NONE\nof the three companion axioms\nholds here, so the companion\nordering theorem does NOT apply'),
+            ('What carries the order?',
+             'Prerequisite gating: a capacity\ncannot recover while a prerequisite\nis offline',
+             'Forward diffusive coupling, which\nstops a descendant overtaking its\nprerequisite, plus the root input u(t)'),
+            ('Does slow-volatility precision\nact back on the upstream\nnodes?',
+             'Not represented; the graph is\nacyclic and carries no feedback',
+             'Yes. Q lowers the shared threshold\nof every node (T1 to T3), closing\nthe loop through a variable that is\nnot a node of the state graph'),
+            ('Why does recovery have this\ndynamics (self-catalysis,\nstability, fragile window,\ncollapse, evidence identity)?',
+             'Out of scope',
+             'This paper (Theorems T1 to T5)'),
+            ('Milestone order of Q against\nthe state nodes',
+             'Ordered as the terminal node of\nthe chain',
+             'Not proved here (Table 2)')]
+TABLE3_CAPTION = ('Table 3. Division of labour with the companion theories, including what does '
+                  'not transfer. The present dynamics lie OUTSIDE the companion recovery-order '
+                  'axiom class: the same node names, a different axiom class.')
+TABLE3_WIDTHS = (30, 34, 36)
 
 
 def emit_table3():
-    rows = [('Question', 'Where it is answered'),
-            ('Why does recovery take this order?', 'companion identifiability theory\n(refs 2, 3)'),
-            ('Why does recovery have this dynamics\n(self-catalysis, stability, fragile window,\ncollapse, evidence identity)?', 'this paper (Theorems T1 to T5)')]
-    _print_table(rows, (46, 34), ['Table 3. Division of labour with the companion theory.'])
+    _print_table(TABLE3_ROWS, TABLE3_WIDTHS, _wrap(TABLE3_CAPTION, 100).split('\n'))
 
 
 def main():
@@ -645,18 +847,19 @@ def main():
     # Figure 1 is written before the integrations, so that it never depends on the rest
     # of the run finishing. Its legend is printed further down, with the other display
     # items, in the order in which they appear in the manuscript.
-    fig1_path = None
+    fig1_path, table_paths = None, {}
     if FIGURE:
-        print("\n-- Figure 1 --")
+        print("\n-- Display items drawn --")
         fig1_path = make_figure1()
+        table_paths = make_display_tables(fig1_path)
     else:
-        print("\n-- Figure 1 skipped (--no-figure) --")
+        print("\n-- Display items skipped (--no-figure) --")
     if FIGURE_ONLY:
         return 0 if (fig1_path or not FIGURE) else 1
 
     t0 = time.time()
     print("\n-- Proved (unconditional) --")
-    check_T0(); check_T1(); check_T2(); check_T3a(); check_T3c1_separatrix()
+    check_T0(); check_T1(); check_T2(); check_T3a(); check_T3c1_separatrix(); check_P1()
     print("\n-- Proved given the observation-model premise --")
     check_T4()
     print("\n-- Conditional (coupling / initial configuration) --")
@@ -670,6 +873,8 @@ def main():
     print("=" * 78)
     print("\n-- Table 1 --")
     emit_table1()
+    if table_paths.get('Table1'):
+        print(f"     drawn to: {table_paths['Table1']}")
     print("\n-- Figure 1 --")
     if fig1_path:
         print(f"     file: {fig1_path}"
@@ -682,8 +887,12 @@ def main():
         print("     [Figure 1] skipped (--no-figure)")
     print("\n-- Table 2 --")
     emit_table2()
+    if table_paths.get('Table2'):
+        print(f"     drawn to: {table_paths['Table2']}")
     print("\n-- Table 3 --")
     emit_table3()
+    if table_paths.get('Table3'):
+        print(f"     drawn to: {table_paths['Table3']}")
     print("\n" + "-" * 78)
     print(f"done in {time.time() - t0:.1f}s. Status mirrors Table 2; Axiom E is disclosed.")
     return 0

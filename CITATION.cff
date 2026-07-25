@@ -9,7 +9,7 @@ abstract: >-
   and regeneration of the paper's display items. The proofs are in the
   manuscript; this software checks the quantitative statements and reproduces
   Table 1, Figure 1, Table 2 and Table 3 in the order in which they appear
-  there.
+  there, both as printed tables and as drawn PNG files.
 type: software
 authors:
   - family-names: Saito
@@ -18,8 +18,8 @@ authors:
     affiliation: >-
       Onda-Daini Hospital, Chiba, Japan; Department of Neuropsychiatry,
       Nippon Medical School, Tokyo, Japan
-version: 1.0.0
-date-released: "2026-07-22"
+version: 1.1.0
+date-released: "2026-07-25"
 license: MIT
 repository-code: "https://github.com/entrance4-png/evidence-closed-loop"
 keywords:

@@ -1,14 +1,17 @@
 ==============================================================================
 A unified dynamical theory of catatonia recovery from an evidence-coupled
-bistable cascade : reference implementation  [mode: quick]
+bistable cascade : reference implementation  [mode: full]
 kappa=[0.6, 0.6, 0.6] eps=0.02 rho=1.0 a0=0.6 a1=0.15 p=2.0
 ==============================================================================
 
--- Figure 1 --
-     [Figure 1] written to /home/claude/repo/figure1.png (278 kB)
+-- Display items drawn --
+     [Figure 1] written to /path/to/evidence-closed-loop/figure1.png (279 kB)
+     [Table1] written to /path/to/evidence-closed-loop/table1.png (147 kB)
+     [Table2] written to /path/to/evidence-closed-loop/table2.png (503 kB)
+     [Table3] written to /path/to/evidence-closed-loop/table3.png (391 kB)
 
 -- Proved (unconditional) --
-[T0 proved] invariance of [0,1]^5: 0 violations in 5000 samples -> PASS
+[T0 proved] invariance of [0,1]^5: 0 violations in 20000 samples -> PASS
 [T1 proved] evidence-mediated acceleration: dr/dQ>0, convexity d2r/dQ2>0; degree a''/a'=(p-1)/Q:
         Q=0.25: a''/a'=4.0000  (p-1)/Q=4.0000
         Q=0.5: a''/a'=2.0000  (p-1)/Q=2.0000
@@ -20,16 +23,20 @@ kappa=[0.6, 0.6, 0.6] eps=0.02 rho=1.0 a0=0.6 a1=0.15 p=2.0
      E_path rho=1.0: Q-eigenvalue=-1.24e-03 (<0 hyperbolic)
      E_path rho=0.0: Q-eigenvalue=0.00e+00 (=0 NON-hyperbolic)
 [T3a proved] frozen-evidence ROOT trigger (root-only criterion r0(T)<0.15):
-        Delta=0.55: r0+=0.45 predicted Q_c=0.5774 measured=0.5772
-        Delta=0.5: r0+=0.50 predicted Q_c=0.4714 measured=0.4715
+        Delta=0.55: r0+=0.45 predicted Q_c=0.5774 measured=0.5773
+        Delta=0.5: r0+=0.50 predicted Q_c=0.4714 measured=0.4714
 [T3c1 proved] exact invariant SWITCHING MANIFOLD of root: boundary=Q_c=0.57735 at every eps:
         eps=0.02: root boundary=0.57735 (|b-Q_c|=0.00000; exact, not singular-limit)
         eps=0.005: root boundary=0.57735 (|b-Q_c|=0.00000; exact, not singular-limit)
+[P1 proved] root-initiated order preservation, 28 configurations (kappa, root level, Q0): 0 violations, worst gap min(r_k - r_k+1) = 0.00e+00 -> PASS
+     state diagonal invariant under u = 0: max spread over the four states = 0.0e+00 (exactly uniform onset recovers synchronously,
+     so ordered recovery needs the symmetry breaking supplied by u(t))
 
 -- Proved given the observation-model premise --
 [T4 premise] closed form Q(t)=1-(1-Q0)exp(-eps N(t)) vs integration, N carried as a coordinate:
         Q0=0.0: Q(400)=0.0153418323  closed form=0.0153418323  max|difference|=2.6e-17
         Q0=0.4: Q(400)=0.4631339937  closed form=0.4631339937  max|difference|=5.6e-16
+        Q0=0.8: Q(400)=0.9492693971  closed form=0.9492693971  max|difference|=3.3e-16
         Q0=0.4: Q(t=20000)=1.0000 (Q -> 1 asymptotically; Q < 1 at every finite time)
 
 -- Conditional (coupling / initial configuration) --
@@ -37,7 +44,10 @@ kappa=[0.6, 0.6, 0.6] eps=0.02 rho=1.0 a0=0.6 a1=0.15 p=2.0
      conservative sufficient bound kappa>1.155; propagation vs kappa:
         kappa=0.00 (<bound): no/partial (max r=1.000, Q=0.009)
         kappa=0.05 (<bound): COLLAPSE (max r=0.000, Q=0.009)
+        kappa=0.10 (<bound): COLLAPSE (max r=0.000, Q=0.009)
+        kappa=0.40 (<bound): COLLAPSE (max r=0.000, Q=0.009)
         kappa=0.60 (<bound): COLLAPSE (max r=0.000, Q=0.009)
+        kappa=1.20 (>bound): COLLAPSE (max r=0.000, Q=0.009)
 [T3c2] absorption needs a RECOVERED config; not unconditional over data:
      recovered config, sub-threshold: r_min=1.000 -> absorbed
      root-recovered but downstream=0, kappa=0.0: r=[1. 0. 0. 0.] (STUCK => IC needed)
@@ -48,11 +58,20 @@ kappa=[0.6, 0.6, 0.6] eps=0.02 rho=1.0 a0=0.6 a1=0.15 p=2.0
      S-continuum E_S(Q)=(a(Q),...,Q): max|d| over Q=0.0e+00 (=0 => only 2 ATTRACTORS off S, not 2 equilibria)
      representative off-manifold ICs (finite sample, not a proof):
      z(0)=+0.52 -> E_rec OK
+     z(0)=+0.11 -> E_rec OK
      z(0)=-0.04 -> E_path OK
+     z(0)=-0.55 -> E_path OK
      weak coupling kappa=0.003 (a1^2/4=0.0056 is first-stage low-root threshold only):
         mixed eq r=[1.00e+00 2.38e-02 5.00e-04 0.00e+00] Q=1.0000; residual |f|inf=3.5e-18
         analytic eig: state-block max=-1.00e-01, Q-dir=-5.11e-13; numeric(inward) max=-5.11e-13
         -> GENUINE STABLE mixed eq (global bistability FALSE)
+        PREDICTION 1 reads this branch: it is NOT a mild residual state. The root is
+        fully recovered while policy, motivational and fast-volatility precision are
+        essentially absent at fully consolidated evidence, i.e. a severe stationary
+        partial state (restored reactivity, absent initiation, absent contextual
+        stability). State-block eigenvalues are of order 1e-01 while the evidence
+        direction is effectively neutral, so the configuration is entered on the
+        ordinary recovery timescale and then persists rather than drifting.
 
 -- Structural dependence (Table 1) --
 [Table 1] structural dependence, one ablation per row (illustrative; not a proof
@@ -84,9 +103,10 @@ DISPLAY ITEMS, in the order in which they appear in the manuscript
      Table 1. Structural dependence within the present construction: removing each
      listed structure eliminates at least the corresponding component. This does not
      assert logical independence or uniqueness of the axioms.
+     drawn to: /path/to/evidence-closed-loop/table1.png
 
 -- Figure 1 --
-     file: /home/claude/repo/figure1.png
+     file: /path/to/evidence-closed-loop/figure1.png
      Figure 1. Dependency structure of the construction. Axiom A, the forward
      dependency chain, splits into a recovery direction, in which evidence gating
      (Axiom C) yields the evidence law (T4), concave basin deepening (Axiom D) then
@@ -96,8 +116,8 @@ DISPLAY ITEMS, in the order in which they appear in the manuscript
      collapse (T3). Under strong coupling both directions resolve into the global
      two-outcome dichotomy (T5). The dashed edge is the self-catalytic feedback by
      which downstream recovery raises the evidence rate. The top row maps the paper:
-     bedside observations motivate the five axioms (A to E), which entail the
-     theorems T1 to T5, which yield the testable predictions.
+     independently reported clinical features motivate the five axioms (A to E),
+     which entail the theorems T1 to T5, which yield the testable predictions.
 
 -- Table 2 --
      +--------------------------------------------+--------------------------------------+
@@ -142,25 +162,61 @@ DISPLAY ITEMS, in the order in which they appear in the manuscript
      | E_rec and E_path are the only equilibria   | False (equilibrium continuum E_S     |
      |                                            | on S)                                |
      +--------------------------------------------+--------------------------------------+
+     | Proposition 1 state order under            | Proved (four state nodes;            |
+     | root-initiated recovery                    | Methods)                             |
+     +--------------------------------------------+--------------------------------------+
+     | Milestone order of Q relative to the       | Not proved here; the five-parameter  |
+     | state nodes                                | order is established in the companion |
+     |                                            | theory under a DIFFERENT axiom class |
+     |                                            | (refs 13, 14) and is not re-derived  |
+     +--------------------------------------------+--------------------------------------+
      | Axiom E (regime exclusivity)               | Modelling commitment, stated at      |
-     |                                            | class level                          |
+     |                                            | class level; load-bearing idealisation |
+     |                                            | (see Discussion)                     |
      +--------------------------------------------+--------------------------------------+
      | Clinical validity of the observation model | Empirical; out of scope here         |
      +--------------------------------------------+--------------------------------------+
-     Table 2. Status of theoretical results.
+     Table 2. Status of theoretical results. All numerical values quoted in this
+     table and in the text are illustrative and depend on the selector shape and
+     parameter choice; the theorems depend only on the class properties of Axiom E.
+     drawn to: /path/to/evidence-closed-loop/table2.png
 
 -- Table 3 --
-     +------------------------------------------------+------------------------------------+
-     | Question                                       | Where it is answered               |
-     +------------------------------------------------+------------------------------------+
-     | Why does recovery take this order?             | companion identifiability theory   |
-     |                                                | (refs 2, 3)                        |
-     +------------------------------------------------+------------------------------------+
-     | Why does recovery have this dynamics           | this paper (Theorems T1 to T5)     |
-     | (self-catalysis, stability, fragile window,    |                                    |
-     | collapse, evidence identity)?                  |                                    |
-     +------------------------------------------------+------------------------------------+
-     Table 3. Division of labour with the companion theory.
+     +--------------------------------+------------------------------------+--------------------------------------+
+     | Question                       | Companion identifiability theory   | This paper                           |
+     |                                | (refs 13, 14)                      |                                      |
+     +--------------------------------+------------------------------------+--------------------------------------+
+     | Why does recovery take this    | Derived from the zero-pattern of   | Not re-derived. The same order is    |
+     | order?                         | the joint Fisher information,      | reproduced by a DIFFERENT            |
+     |                                | independently of any recovery law  | mechanism (Proposition 1)            |
+     +--------------------------------+------------------------------------+--------------------------------------+
+     | Which axiom class?             | Availability gating; deficit-closing | Diffusive coupling; bistable field;  |
+     |                                | recovery; common impaired onset    | ordered root-initiated onset. NONE   |
+     |                                |                                    | of the three companion axioms        |
+     |                                |                                    | holds here, so the companion         |
+     |                                |                                    | ordering theorem does NOT apply      |
+     +--------------------------------+------------------------------------+--------------------------------------+
+     | What carries the order?        | Prerequisite gating: a capacity    | Forward diffusive coupling, which    |
+     |                                | cannot recover while a prerequisite | stops a descendant overtaking its    |
+     |                                | is offline                         | prerequisite, plus the root input u(t) |
+     +--------------------------------+------------------------------------+--------------------------------------+
+     | Does slow-volatility precision | Not represented; the graph is      | Yes. Q lowers the shared threshold   |
+     | act back on the upstream       | acyclic and carries no feedback    | of every node (T1 to T3), closing    |
+     | nodes?                         |                                    | the loop through a variable that is  |
+     |                                |                                    | not a node of the state graph        |
+     +--------------------------------+------------------------------------+--------------------------------------+
+     | Why does recovery have this    | Out of scope                       | This paper (Theorems T1 to T5)       |
+     | dynamics (self-catalysis,      |                                    |                                      |
+     | stability, fragile window,     |                                    |                                      |
+     | collapse, evidence identity)?  |                                    |                                      |
+     +--------------------------------+------------------------------------+--------------------------------------+
+     | Milestone order of Q against   | Ordered as the terminal node of    | Not proved here (Table 2)            |
+     | the state nodes                | the chain                          |                                      |
+     +--------------------------------+------------------------------------+--------------------------------------+
+     Table 3. Division of labour with the companion theories, including what does not transfer. The
+     present dynamics lie OUTSIDE the companion recovery-order axiom class: the same node names, a
+     different axiom class.
+     drawn to: /path/to/evidence-closed-loop/table3.png
 
 ------------------------------------------------------------------------------
-done in 79.5s. Status mirrors Table 2; Axiom E is disclosed.
+done in 175.1s. Status mirrors Table 2; Axiom E is disclosed.
