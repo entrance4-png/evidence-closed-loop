@@ -1,137 +1,113 @@
 # evidence-closed-loop
 
-Reference implementation for the theory paper
+Reference implementation for
 
-> **A unified dynamical theory of catatonia recovery from an evidence-coupled bistable cascade**
-> Hiroki Saito
+**Evidence-coupled bistability converts dependency structure into a recovery geometry**
+Hiroki Saito
 
-Numerical corroboration for the theorems, and regeneration of every display item of the
-manuscript. The proofs are in the manuscript (Results and Methods). **Nothing in this
-repository is part of a proof**: the code checks that the analytical statements are
-self-consistent and reproduces the quantitative values quoted in the paper.
+This repository contains the single script that reproduces every result reported in
+the manuscript and regenerates every display item: Tables 1 to 3, Figures 1 and 2,
+and the supplementary figure. Every number quoted in the manuscript is printed by
+the script next to its computed value, so the text and the code can be compared
+line by line.
 
-## Requirements
-
-Python 3.10 or later, with
-
-```
-numpy
-scipy
-matplotlib
-```
+## Quick start
 
 ```bash
-python3 -m pip install -r requirements.txt
+pip install -r requirements.txt
+python evidence_closed_loop.py
 ```
 
-## Running it
+The default (quick) mode runs all checks and writes every display item in about
+100 seconds on a laptop. The run ends with `all quoted values reproduced` when the
+manuscript values and the computed values agree.
 
-```bash
-python3 evidence_closed_loop.py --full        # complete verification, about 3 minutes
-python3 evidence_closed_loop.py               # quick pass (default), coarser sweeps
-python3 evidence_closed_loop.py --figure-only # draw the display items and exit
-python3 evidence_closed_loop.py --no-figure   # verification only, no images
-```
+### Run modes
 
-`--figure-path PATH` sets where `figure1.png` is written; the three table images go into
-the same directory, which is created if it does not exist.
-
-Runtime is integration bound. `--full` is what produced `expected_output.txt`.
-
-## What a run produces
-
-Four PNG files are written next to the script, **before** the integrations start, so they
-do not depend on the rest of the run finishing:
-
-| File | Display item |
+| Command | What it does |
 |---|---|
-| `table1.png` | Table 1, structural dependence |
-| `figure1.png` | Figure 1, dependency structure of the construction |
-| `table2.png` | Table 2, status of theoretical results |
-| `table3.png` | Table 3, division of labour with the companion theories |
+| `python evidence_closed_loop.py` | quick mode, all checks, all display items |
+| `python evidence_closed_loop.py --full` | finer parameter sweeps |
+| `python evidence_closed_loop.py --fast` | coarser sweeps, about a quarter of the time |
+| `python evidence_closed_loop.py --no-figures` | checks only, no files written |
+| `python evidence_closed_loop.py --json out.json` | also dump every result as JSON |
 
-Each table image is drawn from the same row text and the same column proportions as the
-plain-text table the script prints, so the drawn and the printed versions cannot drift
-apart. In a Jupyter or Colab notebook the images are also shown inline as they are
-written.
+The switching-boundary measurements are bisected to 1e-7 in every run mode, so the
+values quoted in the manuscript do not depend on the mode chosen.
 
-The console output is grouped by the status of each result, mirroring Table 2 of the
-manuscript: proved unconditionally, proved given the observation-model premise, proved
-under an explicit condition, and the two-outcome result under strong coupling.
+### Notebooks (Jupyter, Google Colab)
 
-## Checking a run against the reference
+```python
+!python evidence_closed_loop.py           # works inside a Colab cell
+import evidence_closed_loop as m; res = m.run()
+```
 
-`expected_output.txt` is the full output of `--full` on the reference machine. Differences
-that are harmless:
-
-- **file paths**, which are placeholders in the reference file and will be your own paths
-- **the runtime line** at the end
-- **last-digit floating-point noise** in Monte-Carlo and bisection quantities
-
-Anything else, in particular a `PASS` that has become `FAIL`, a changed boundary value or
-a changed eigenvalue, is a real difference and worth reporting as an issue.
+Unknown command line arguments are ignored, so the `-f kernel.json` that a notebook
+kernel injects into `sys.argv` does not abort the run, and the figures are displayed
+inline when a notebook front end is detected.
 
 ## The model
 
-State variables `r_k` in [0,1] for k = 0..3 index sensory, policy, motivational and
-fast-volatility precision. The evidence variable `Q` in [0,1] is identified with
-slow-volatility precision. With `z = r_0 - a(Q)`,
-
 ```
-dr_0/dt = g(r_0,Q)  [ + u(t) ]
-dr_k/dt = g(r_k,Q) + kappa_k (r_{k-1} - r_k),        k = 1..3,  kappa_0 = 0
-dQ/dt   = eps [ chi_+(z) C(r) (1-Q) - rho chi_-(z) Q ]
+dr0/dt = g(r0, Q)                            + u(t)
+drk/dt = g(rk, Q) + kappa_k (r_{k-1} - rk),    k = 1, ..., n
+dQ/dt  = eps [ chi_+(z) C(r) (1 - Q) - rho chi_-(z) Q ]
 
-g(r,Q) = r(1-r)(r-a(Q)),   C(r) = prod_j r_j,   a(Q) = a0 - (a0-a1) Q^p,   p > 1
+g(r, Q) = r (1 - r) (r - a(Q)),   C(r) = prod_j r_j,
+a(Q)    = a0 - (a0 - a1) Q**p,    z = r0 - a(Q).
 ```
 
-Illustrative parameters: `kappa = 0.6`, `eps = 0.02`, `rho = 1`, `a0 = 0.60`, `a1 = 0.15`,
-`p = 2`. No parameter search was performed to force any outcome.
+The theorems are proved in the Methods for a forward acyclic chain of `n + 1`
+capacities. This implementation is the displayed case `n = 3`, the shortest chain
+with a root, an interior pair and a leaf.
 
-## Two things to read before quoting a number
+## What the script checks
 
-**Axiom E is the load-bearing idealisation.** The mutual exclusivity of the selectors
-(disjoint supports, both vanishing at `z = 0`) is what makes the switching manifold `S`
-invariant at every timescale. The exactness of T3(c1) and its independence of `eps` are
-therefore consequences of that modelling choice, not independent findings. The ablation in
-Table 1 replaces the exclusive selectors by an overlapping soft pair and the boundary
-becomes `eps`-dependent, approaching the exact value as the evidence timescale is made
-slow: 0.5935 at `eps = 0.02`, 0.5820 at `eps = 0.005`, against `Q_c = 0.5774`.
+| Check | Result verified |
+|---|---|
+| T0 | positive invariance of the state cube |
+| K* | the uniform bound on `g_r`, and `g(x,Q) <= K* x` used by Proposition 6(b) |
+| T2 | both corner equilibria, their spectra against the analytic Jacobian |
+| T4 | the closed-form evidence law and the general linear solution |
+| Proposition 1 | boundary zeros at finite sharpness, and the sharp-selection limit |
+| T3 | the fragile window, propagation, and invariance of the switching surface |
+| T5 | two-outcome convergence under strong coupling |
+| weak coupling | the stable mixed branch and its saddle-node |
+| Proposition 3 | order preservation and ordered first-passage times |
+| Proposition 4 | closure of the loop: the Fisher information about the terminal node accumulates as the product gate |
+| Proposition 5 | Axiom D from an active-inference decision layer |
+| Proposition 6 | the dichotomy at finite decision sharpness |
+| Proposition 7 | gate robustness, a leaky gate, and the O(eps eta) drift when E4 is violated |
+| Table 1 | the ablations, one row at a time |
 
-**All printed numbers are illustrative.** Milestone and consolidation times, boundary
-locations and the mixed-branch eigenvalues depend on the selector shape and the parameter
-choice. Because `chi_+(z) = exp(-1/z^2)` is extremely small for small `z`, **timescales in
-particular must not be read as predicted real times**. The theorems depend only on the
-class properties stated in Axiom E and are unaffected by this dependence.
+## Output files
+
+Running with figures writes, in the working directory:
+
+```
+evidence_closed_loop_table1.tsv / .png
+evidence_closed_loop_table2.tsv / .png
+evidence_closed_loop_table3.tsv / .png
+figure1.png
+figure2.png
+supplementary_figure1.png
+```
+
+## Requirements
+
+Python 3.10 or later with numpy, scipy and matplotlib. All three are preinstalled
+in Google Colab.
 
 ## Citing
 
-Cite the archived release, not this repository. See `CITATION.cff`.
+If you use this code, please cite the archived release:
 
-The concept DOI [10.5281/zenodo.21500263](https://doi.org/10.5281/zenodo.21500263) always
-resolves to the latest archived version.
+> Saito, H. evidence-closed-loop: reference implementation for "Evidence-coupled
+> bistability converts dependency structure into a recovery geometry". Zenodo,
+> https://doi.org/10.5281/zenodo.21500263 (2026).
 
-## License
+Machine readable metadata is in `CITATION.cff`.
 
-MIT, see `LICENSE`. The licence covers the software in this repository. It does not cover
-the manuscript.
+## Licence
 
-## Changelog
-
-**1.1.0**
-- Tables 1 to 3 are now drawn as PNG files alongside Figure 1, from the same row text and
-  column proportions as the plain-text tables.
-- `--figure-path` now creates the target directory if it does not exist, and the three
-  table images follow Figure 1 into it.
-- Table 2 records the milestone-order row as established in the companion theory under a
-  different axiom class rather than inherited from it, and Table 3 is expanded to state
-  what does not transfer between the two axiom classes.
-- The header documents Axiom E as a disclosed idealisation and flags every printed number
-  as illustrative.
-- Figure 1 top banner reads "reported clinical features" rather than "bedside
-  observations", matching the revised manuscript.
-- No change to any equation, parameter, theorem check or numerical result. Every computed
-  line of `--full` is identical to the 1.0.0 output.
-
-**1.0.0**
-- First archived release.
+MIT. See `LICENSE`.

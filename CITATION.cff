@@ -1,33 +1,27 @@
 cff-version: 1.2.0
-message: >-
-  If you use this software, please cite the archived release below.
-title: >-
-  evidence-closed-loop: reference implementation for a unified dynamical
-  theory of catatonia recovery from an evidence-coupled bistable cascade
+message: "If you use this software, please cite it using these metadata."
+title: "evidence-closed-loop: reference implementation for \"Evidence-coupled bistability converts dependency structure into a recovery geometry\""
 abstract: >-
-  Numerical corroboration for the theorems of the accompanying theory paper,
-  and regeneration of the paper's display items. The proofs are in the
-  manuscript; this software checks the quantitative statements and reproduces
-  Table 1, Figure 1, Table 2 and Table 3 in the order in which they appear
-  there, both as printed tables and as drawn PNG files.
+  Reference implementation for the manuscript "Evidence-coupled bistability
+  converts dependency structure into a recovery geometry". The single script
+  verifies every theorem and proposition reported in the manuscript, prints each
+  quoted value beside its computed value, and regenerates every display item.
 type: software
 authors:
   - family-names: Saito
     given-names: Hiroki
     orcid: "https://orcid.org/0000-0002-4964-8559"
-    affiliation: >-
-      Onda-Daini Hospital, Chiba, Japan; Department of Neuropsychiatry,
-      Nippon Medical School, Tokyo, Japan
-version: 1.1.0
-date-released: "2026-07-25"
+    affiliation: "Department of Neuropsychiatry, Nippon Medical School; Onda-Daini Hospital, Chiba, Japan"
+version: "1.0.0"
+date-released: "2026-07-29"
 license: MIT
 repository-code: "https://github.com/entrance4-png/evidence-closed-loop"
+doi: "10.5281/zenodo.21500263"
 keywords:
-  - catatonia
-  - computational psychiatry
-  - dynamical systems
+  - dependency structure
   - bistability
   - Allee threshold
+  - active inference
   - Fisher information
-  - asymptotically autonomous systems
-  - reproducibility
+  - recovery dynamics
+  - catatonia
