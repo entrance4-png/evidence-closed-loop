@@ -1,0 +1,29 @@
+{
+  "title": "evidence-closed-loop: reference implementation for \"Evidence-coupled bistability converts dependency structure into a recovery geometry\"",
+  "description": "<p>Reference implementation for the manuscript <em>Evidence-coupled bistability converts dependency structure into a recovery geometry</em> (H. Saito). A single Python script verifies every theorem and proposition reported in the manuscript, prints each quoted value beside its computed value, and regenerates every display item (Tables 1 to 3, Figures 1 and 2, and the supplementary figure). Run <code>python evidence_closed_loop.py</code>; the run ends with <code>all quoted values reproduced</code>.</p>",
+  "upload_type": "software",
+  "license": "mit",
+  "creators": [
+    {
+      "name": "Saito, Hiroki",
+      "orcid": "0000-0002-4964-8559",
+      "affiliation": "Department of Neuropsychiatry, Nippon Medical School; Onda-Daini Hospital, Chiba, Japan"
+    }
+  ],
+  "keywords": [
+    "dependency structure",
+    "bistability",
+    "Allee threshold",
+    "active inference",
+    "Fisher information",
+    "recovery dynamics",
+    "catatonia"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/entrance4-png/evidence-closed-loop",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}
