@@ -1,0 +1,87 @@
+result                                       check   status
+------------------------------------------------------------------------------------------
+T0 positive invariance                       pass    proved
+K* uniform bound                             pass    proved (sufficient, not sharp)
+T2 stability of both corners                 pass    proved
+T4 evidence law                              pass    proved on {z>0}; general form in Methods
+Proposition 1 sharp-selection limit          pass    proved (a) and (b)
+T3 fragile window and propagation            pass    proved
+T5 two-outcome convergence                   pass    proved under kappa > K*
+weak-coupling mixed branch                   pass    characterised
+Proposition 3 order preservation             pass    proved
+Proposition 4 closure                        pass    proved (given M1-M3 and O1-O3)
+Proposition 5 Axiom D                        pass    proved (given D1-D4)
+Proposition 6 finite sharpness               pass    proved (finite gamma)
+Proposition 7 gate robustness and E4 drift   pass    proved (comparable gates); drift measured
+Table 1 ablations                            pass    illustrative
+------------------------------------------------------------------------------------------
+mode: full   elapsed: [machine-dependent]
+
+key quantities quoted in the manuscript
+quantity                                      manuscript        computed   check
+----------------------------------------------------------------------------------------
+K* = max (1-a+a^2)/3 on [a1,a0]                    0.291        0.290833   ok
+max_x g_r over the cube (<= K*)                        -        0.290832   
+max g(x,Q)/x over the cube (<= K*, Proposition 6b)           -        0.180625   
+Qc for Delta = 0.55 (T3a)                         0.5774         0.57735   ok
+collapse boundary, sharp, eps = 0.02              0.5774         0.57735   ok
+collapse boundary, sharp, eps = 0.005             0.5774         0.57735   ok
+boundary, finite gamma with E4, eps = 0.02        0.5774         0.57735   ok
+boundary, finite gamma with E4, eps = 0.005       0.5774         0.57735   ok
+boundary, plain averaging, eps = 0.02              0.594        0.594022   ok
+boundary, plain averaging, eps = 0.005             0.582        0.582019   ok
+boundary, plain averaging, eps = 0.00125          0.5786        0.578556   ok
+a1^2/4, first-stage low-root threshold            0.0056        0.005625   ok
+saddle-node r1 = a1/2                              0.075           0.075   ok
+I(pi_v_slow) vs mu_slow, max relative error            -     2.91916e-10   
+leak of pi_v_slow into the other four channels           0               0   ok
+Lemma C1 bracket, min M_slow / C(r) (>= 1)             -          1.0132   
+Lemma C1 bracket, max M_slow / C(r) (<= K)             -         1.94014   
+Lemma C1 constant K = B / (1 - exp(-B))                -         2.31304   
+per-context count vs integral of C(r), relative error           -     6.66935e-06   
+first passage of Q vs the last capacity (corollary)           -          1624.6   
+Axiom D: max dG1/dr over the sampled range (< 0)           -     -0.00930576   
+Axiom D: max dG1/dLambda over the sampled range (< 0)           -    -3.13277e-06   
+Axiom D: max a'(Q) at Lstar = 2 (< 0)                  -       -0.146569   
+Axiom D: max a''(Q) at Lstar = 2 (< 0)                 -      -0.0321324   
+Axiom D: max a''(Q) at Lstar = 5 (> 0, control)           -        0.348253   
+Axiom D: elasticity q at Lambda0                    3.91         3.90747   ok
+Axiom D: elasticity q as Lambda -> infinity            2         2.00237   ok
+Axiom D: max q Lstar / Lambda, Lstar = 2            0.78        0.781493   ok
+Axiom D: max q Lstar / Lambda, Lstar = 5            1.95         1.95373   ok
+finite gamma: 1 - Q at gamma = 20 (vs fixed point)           -     4.13994e-08   
+finite gamma: fixed-point prediction at gamma = 20           -     4.13994e-08   
+finite gamma: bound rho exp[-gamma(1-a0)] at gamma = 20           -     0.000335463   
+Lemma F: explicit margin z_bar at gamma = 20           -       0.0248656   
+finite gamma: min margin z on the recovery side           -          0.4125   
+comparable gate: boundary minus Qc                     0    -1.60516e-08   ok
+leaky gate: dQ/dt with one capacity offline            -     2.80332e-07   
+leak at finite sharpness: Q at the failed corner           -     6.14421e-08   
+leak at finite sharpness: predicted failed-corner Q           -     6.14421e-08   
+E4 violation: drift / (eps eta), minimum               -        0.935132   
+E4 violation: drift / (eps eta), maximum               -         0.97292   
+T4 closed form, absolute error                         -     3.33067e-16   
+general linear solution, max error                     -     6.73073e-16   
+indicator limit, jump at z = 0 (why E regularises)           1               1   ok
+Erec Q-eigenvalue vs -eps chi_+(1-a1)                  -     -0.00501107   
+Epath Q-eigenvalue vs -eps rho chi_-(-a0)              -     -0.00124353   
+corner spectra, max error against the analytic Jacobian           0     1.20186e-10   ok
+T5 trajectories, all as predicted                      -            True   ok
+orbit started on S reaches ES                          -            True   ok
+----------------------------------------------------------------------------------------
+mixed branch at kappa = 0.003, Q = 1
+  equilibrium r          [1.0, 0.023765, 0.000468, 9e-06, 1.0]
+  state eigenvalues      [-0.85, -0.152979, -0.151925, -0.100034]
+  hyperbolically stable  True
+  saddle-node at kappa1  0.005625  (zero eigenvalue: [-0.85, -0.155395, -0.149283, -0.0])
+corner spectra
+  rho>0  Erec [-1.45, -1.45, -1.45, -0.85, -0.005011]
+  rho>0  Epath [-1.2, -1.2, -1.2, -0.6, -0.001244]
+  rho=0  Erec [-1.45, -1.45, -1.45, -0.85, -0.005011]
+  rho=0  Epath [-1.2, -1.2, -1.2, -0.6, 0.0]
+Proposition 3 first-passage times at q = 0.8: [0.0, 1.0, 2.9000000000000004, 5.0]
+selectors at z = 0, finite gamma: {'entropy,gamma=1': [0.0, 0.0], 'entropy,gamma=5': [0.0, 0.0], 'entropy,gamma=20': [0.0, 0.0], 'entropy,gamma=200': [0.0, 0.0], 'entropy2,gamma=1': [0.0, 0.0], 'entropy2,gamma=5': [0.0, 0.0], 'entropy2,gamma=20': [0.0, 0.0], 'entropy2,gamma=200': [0.0, 0.0], 'margin,gamma=1': [0.0, 0.0], 'margin,gamma=5': [0.0, 0.0], 'margin,gamma=20': [0.0, 0.0], 'margin,gamma=200': [0.0, 0.0]}
+selectors at z = 0, plain averaging: [0.5, 0.5]
+sup |chi - indicator| off the boundary: {2.0: 0.9990544510124191, 5.0: 0.9937128387531754, 20.0: 0.8829878882602711, 100.0: 0.06427180116178766, 500.0: 5.348278486749791e-10}
+----------------------------------------------------------------------------------------
+all quoted values reproduced

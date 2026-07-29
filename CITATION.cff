@@ -1,27 +1,19 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it using these metadata."
-title: "evidence-closed-loop: reference implementation for \"Evidence-coupled bistability converts dependency structure into a recovery geometry\""
-abstract: >-
-  Reference implementation for the manuscript "Evidence-coupled bistability
-  converts dependency structure into a recovery geometry". The single script
-  verifies every theorem and proposition reported in the manuscript, prints each
-  quoted value beside its computed value, and regenerates every display item.
+message: "If you use this software, please cite it as below."
+title: "evidence-closed-loop: reference implementation for Evidence-coupled bistability converts dependency structure into a recovery geometry"
 type: software
 authors:
-  - family-names: Saito
-    given-names: Hiroki
+  - family-names: "Saito"
+    given-names: "Hiroki"
     orcid: "https://orcid.org/0000-0002-4964-8559"
-    affiliation: "Department of Neuropsychiatry, Nippon Medical School; Onda-Daini Hospital, Chiba, Japan"
-version: "1.0.0"
-date-released: "2026-07-29"
+    affiliation: "Department of Neuropsychiatry, Nippon Medical School, Tokyo, Japan; Onda-Daini Hospital, Chiba, Japan"
 license: MIT
 repository-code: "https://github.com/entrance4-png/evidence-closed-loop"
 doi: "10.5281/zenodo.21500263"
 keywords:
   - dependency structure
   - bistability
-  - Allee threshold
+  - evidence accumulation
+  - recovery order
   - active inference
-  - Fisher information
-  - recovery dynamics
   - catatonia

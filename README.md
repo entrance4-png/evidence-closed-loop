@@ -1,113 +1,102 @@
 # evidence-closed-loop
 
-Reference implementation for
+Reference implementation and verification script for
 
-**Evidence-coupled bistability converts dependency structure into a recovery geometry**
-Hiroki Saito
+> **Evidence-coupled bistability converts dependency structure into a recovery geometry**
+> Hiroki Saito
 
-This repository contains the single script that reproduces every result reported in
-the manuscript and regenerates every display item: Tables 1 to 3, Figures 1 and 2,
-and the supplementary figure. Every number quoted in the manuscript is printed by
-the script next to its computed value, so the text and the code can be compared
-line by line.
+Every numerical value quoted in the manuscript and its Supplementary Information is produced by this
+script. Nothing is entered by hand. The tables and figures of the paper are written by the same run.
 
-## Quick start
+## Model
 
-```bash
-pip install -r requirements.txt
-python evidence_closed_loop.py
-```
+    dr0/dt = g(r0, Q) + u(t)
+    drk/dt = g(rk, Q) + kappa_k (r_{k-1} - rk),   k = 1, 2, 3
+    dQ/dt  = eps [ chi_+(z) C(r) (1 - Q) - rho chi_-(z) Q ]
 
-The default (quick) mode runs all checks and writes every display item in about
-100 seconds on a laptop. The run ends with `all quoted values reproduced` when the
-manuscript values and the computed values agree.
+with
 
-### Run modes
-
-| Command | What it does |
-|---|---|
-| `python evidence_closed_loop.py` | quick mode, all checks, all display items |
-| `python evidence_closed_loop.py --full` | finer parameter sweeps |
-| `python evidence_closed_loop.py --fast` | coarser sweeps, about a quarter of the time |
-| `python evidence_closed_loop.py --no-figures` | checks only, no files written |
-| `python evidence_closed_loop.py --json out.json` | also dump every result as JSON |
-
-The switching-boundary measurements are bisected to 1e-7 in every run mode, so the
-values quoted in the manuscript do not depend on the mode chosen.
-
-### Notebooks (Jupyter, Google Colab)
-
-```python
-!python evidence_closed_loop.py           # works inside a Colab cell
-import evidence_closed_loop as m; res = m.run()
-```
-
-Unknown command line arguments are ignored, so the `-f kernel.json` that a notebook
-kernel injects into `sys.argv` does not abort the run, and the figures are displayed
-inline when a notebook front end is detected.
-
-## The model
-
-```
-dr0/dt = g(r0, Q)                            + u(t)
-drk/dt = g(rk, Q) + kappa_k (r_{k-1} - rk),    k = 1, ..., n
-dQ/dt  = eps [ chi_+(z) C(r) (1 - Q) - rho chi_-(z) Q ]
-
-g(r, Q) = r (1 - r) (r - a(Q)),   C(r) = prod_j r_j,
-a(Q)    = a0 - (a0 - a1) Q**p,    z = r0 - a(Q).
-```
-
-The theorems are proved in the Methods for a forward acyclic chain of `n + 1`
-capacities. This implementation is the displayed case `n = 3`, the shortest chain
-with a root, an interior pair and a leaf.
-
-## What the script checks
-
-| Check | Result verified |
-|---|---|
-| T0 | positive invariance of the state cube |
-| K* | the uniform bound on `g_r`, and `g(x,Q) <= K* x` used by Proposition 6(b) |
-| T2 | both corner equilibria, their spectra against the analytic Jacobian |
-| T4 | the closed-form evidence law and the general linear solution |
-| Proposition 1 | boundary zeros at finite sharpness, and the sharp-selection limit |
-| T3 | the fragile window, propagation, and invariance of the switching surface |
-| T5 | two-outcome convergence under strong coupling |
-| weak coupling | the stable mixed branch and its saddle-node |
-| Proposition 3 | order preservation and ordered first-passage times |
-| Proposition 4 | closure of the loop: the Fisher information about the terminal node accumulates as the product gate |
-| Proposition 5 | Axiom D from an active-inference decision layer |
-| Proposition 6 | the dichotomy at finite decision sharpness |
-| Proposition 7 | gate robustness, a leaky gate, and the O(eps eta) drift when E4 is violated |
-| Table 1 | the ablations, one row at a time |
-
-## Output files
-
-Running with figures writes, in the working directory:
-
-```
-evidence_closed_loop_table1.tsv / .png
-evidence_closed_loop_table2.tsv / .png
-evidence_closed_loop_table3.tsv / .png
-figure1.png
-figure2.png
-supplementary_figure1.png
-```
+    g(r, Q) = r (1 - r) (r - a(Q)),   C(r) = prod_j r_j,
+    a(Q)    = a0 - (a0 - a1) Q**p,    z = r0 - a(Q).
 
 ## Requirements
 
-Python 3.10 or later with numpy, scipy and matplotlib. All three are preinstalled
-in Google Colab.
+    python >= 3.10
+    pip install -r requirements.txt
 
-## Citing
+Only numpy, scipy and matplotlib are used. No data files are required; the script is
+self-contained and deterministic, with every random seed fixed in the source.
 
-If you use this code, please cite the archived release:
+## Running
 
-> Saito, H. evidence-closed-loop: reference implementation for "Evidence-coupled
-> bistability converts dependency structure into a recovery geometry". Zenodo,
-> https://doi.org/10.5281/zenodo.21500263 (2026).
+    python3 evidence_closed_loop.py            # quick mode, about 1-2 minutes
+    python3 evidence_closed_loop.py --full     # finer sweeps, about 5 minutes
+    python3 evidence_closed_loop.py --fast     # coarser, for a smoke test
+    python3 evidence_closed_loop.py --no-figures
+    python3 evidence_closed_loop.py --json results.json
 
-Machine readable metadata is in `CITATION.cff`.
+A successful run ends with
+
+    all quoted values reproduced
+
+`expected_output.txt` in this repository is the output of `--full --no-figures` on a reference
+machine; only the elapsed-time line is machine-dependent and has been replaced by a placeholder
+there. Any other difference is a discrepancy worth reporting.
+
+## What is checked
+
+| check | status printed |
+|---|---|
+| T0 positive invariance | proved |
+| K* uniform bound | proved (sufficient, not sharp) |
+| T2 stability of both corners | proved |
+| T4 evidence law | proved on {z>0}; general form in Methods |
+| Proposition 1 sharp-selection limit | proved (a) and (b) |
+| T3 fragile window and propagation | proved |
+| T5 two-outcome convergence | proved under kappa > K* |
+| weak-coupling mixed branch | characterised |
+| Proposition 3 order preservation | proved |
+| Proposition 4 closure | proved (given M1-M3 and O1-O3) |
+| Proposition 5 Axiom D | proved (given D1-D4) |
+| Proposition 6 finite sharpness | proved (finite gamma) |
+| Proposition 7 gate robustness and E4 drift | proved (comparable gates); drift measured |
+| Table 1 ablations | illustrative |
+
+The status column repeats the status recorded in Table 2 of the manuscript, so that a reader can see
+at a glance which lines are theorems, which hold on a stated regime, and which are illustrative.
+
+Two checks are controls rather than confirmations. The Axiom D block reports `a''(Q)` at two values
+of the evidence scale: negative at `Lstar = 2`, where the equivalence of Proposition 5(b) holds, and
+positive at `Lstar = 5`, where it fails. The second is the case in which the derivation of concavity
+does not go through, and it is included deliberately.
+
+## Outputs
+
+Running with figures writes
+
+    evidence_closed_loop_table1.tsv / .png
+    evidence_closed_loop_table2.tsv / .png
+    evidence_closed_loop_table3.tsv / .png
+    figure1.png
+    figure2.png
+    supplementary_figure1.png
+
+Figure 1 is the conceptual figure of the paper and Figure 2 the trajectory panel; both are generated
+here, so no display item in the manuscript is drawn by hand.
+
+## Scope
+
+The script verifies the implementation against the analytical results. It is not itself a proof.
+Where a theorem holds only on a stated regime, the check is run inside that regime and the status
+column says so. The premises that are commitments rather than consequences, M1 to M3 and the
+bridging conditions O1 to O3 of Proposition 4, and D1 to D4 of Proposition 5, are implemented as
+written; the script does not test whether they are true of any real system.
 
 ## Licence
 
-MIT. See `LICENSE`.
+MIT. See LICENSE.
+
+## Citation
+
+See CITATION.cff. The archived releases carry a concept DOI that always resolves to the latest
+version: https://doi.org/10.5281/zenodo.21500263
