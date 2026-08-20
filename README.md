@@ -26,6 +26,15 @@ with
 
 Only numpy, scipy and matplotlib are used. No data files are required; the script is
 self-contained and deterministic, with every random seed fixed in the source.
+- OS: developed and tested on macOS. The script contains no OS-specific code and
+  runs on any platform with a supported Python.
+- Python >= 3.10, numpy >= 1.24, scipy >= 1.10, matplotlib >= 3.7
+  (as pinned in requirements.txt).
+- No non-standard hardware is required; the script runs on a standard desktop or
+  laptop CPU.
+- Typical install time on a normal desktop computer: under one minute
+  (`pip install -r requirements.txt`).
+
 
 ## Running
 
@@ -99,4 +108,4 @@ MIT. See LICENSE.
 ## Citation
 
 See CITATION.cff. The archived releases carry a concept DOI that always resolves to the latest
-version: https://doi.org/10.5281/zenodo.21829273
+version: https://doi.org/10.5281/zenodo.21669949
