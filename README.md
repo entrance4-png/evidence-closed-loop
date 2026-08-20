@@ -99,4 +99,4 @@ MIT. See LICENSE.
 ## Citation
 
 See CITATION.cff. The archived releases carry a concept DOI that always resolves to the latest
-version: https://doi.org/10.5281/zenodo.21500263
+version: https://doi.org/10.5281/zenodo.21829273
