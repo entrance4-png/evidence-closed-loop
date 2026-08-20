@@ -9,7 +9,7 @@ authors:
     affiliation: "Department of Neuropsychiatry, Nippon Medical School, Tokyo, Japan; Onda-Daini Hospital, Chiba, Japan"
 license: MIT
 repository-code: "https://github.com/entrance4-png/evidence-closed-loop"
-doi: "10.5281/zenodo.21500263"
+doi: "10.5281/zenodo.21829273"
 keywords:
   - dependency structure
   - bistability
